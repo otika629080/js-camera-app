@@ -91,7 +91,7 @@
               if (capabilities.focusMode && capabilities.focusMode.includes("continuous")) {
                   await track.applyConstraints({ advanced: [{ focusMode: "continuous" }] });
               } else {
-                  console.log("このデバイスではオートフォーカスがサポートされていません。");
+                  alert("このデバイスではオートフォーカスがサポートされていません。");
               }
 
               this.applyFilter();
