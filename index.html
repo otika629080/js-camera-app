@@ -17,28 +17,22 @@
   
   <footer class="bg-black text-white p-4">
     <div class="flex justify-around items-center">
-      <button id="switchCamera" class="focus:outline-none" aria-label="カメラ切り替え">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-        </svg>
+      <button id="switchCamera" class="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" aria-label="カメラ切り替え">
+        切り替え
       </button>
-      <button id="capture" class="bg-white rounded-full p-2 focus:outline-none" aria-label="写真を撮る">
-        <div class="w-16 h-16 rounded-full border-4 border-black"></div>
+      <button id="capture" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline" aria-label="写真を撮る">
+        撮影
       </button>
-      <button id="flash" class="focus:outline-none" aria-label="フラッシュ切り替え">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-        </svg>
+      <button id="flash" class="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" aria-label="フラッシュ切り替え">
+        フラッシュ
       </button>
     </div>
   </footer>
 
   <div id="capturedImageOverlay" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden">
     <img id="snapshot" alt="キャプチャ画像" class="max-w-full max-h-full" />
-    <button id="closeOverlay" class="absolute top-4 right-4 text-white focus:outline-none" aria-label="閉じる">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-      </svg>
+    <button id="closeOverlay" class="absolute top-4 right-4 bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" aria-label="閉じる">
+      閉じる
     </button>
   </div>
 
