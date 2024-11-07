@@ -55,14 +55,14 @@
 
         this.currentStream = null;
         this.isBackCamera = true;
-        this.zoomLevel = 1;
+        this.zoomLevel = 1;  // 初期ズームレベル
         this.filterEnabled = false;
 
         document.getElementById("startCamera").addEventListener("click", () => this.initCamera());
         document.getElementById("capture").addEventListener("click", () => this.capturePhoto());
         document.getElementById("stopCamera").addEventListener("click", () => this.stopCamera());
         document.getElementById("switchCamera").addEventListener("click", () => this.switchCamera());
-        document.getElementById("zoom").addEventListener("click", () => this.toggleZoom());
+        document.getElementById("zoom").addEventListener("click", () => this.applyZoom());
         document.getElementById("filter").addEventListener("click", () => this.toggleFilter());
         document.getElementById("closeOverlay").addEventListener("click", () => this.closeOverlay());
       }
@@ -122,8 +122,8 @@
         this.capturedImageOverlay.classList.add("hidden");
       }
 
-      toggleZoom() {
-        this.zoomLevel = this.zoomLevel === 1 ? 2 : 1;
+      applyZoom() {
+        this.zoomLevel = 2;  // ズームを2倍に固定
         const track = this.currentStream.getVideoTracks()[0];
         track.applyConstraints({ advanced: [{ zoom: this.zoomLevel }] });
       }
