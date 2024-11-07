@@ -68,25 +68,36 @@
       }
 
       async initCamera() {
-        const constraints = {
-          video: {
-            facingMode: this.isBackCamera ? "environment" : "user",
-            width: { ideal: 1280 },
-            height: { ideal: 720 }
+          const constraints = {
+              video: {
+                  facingMode: this.isBackCamera ? "environment" : "user",
+                  width: { ideal: 1280 },
+                  height: { ideal: 720 }
+              }
+          };
+
+          if (this.currentStream) {
+              this.stopCamera();
           }
-        };
 
-        if (this.currentStream) {
-          this.stopCamera();
-        }
+          try {
+              this.currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+              this.videoElement.srcObject = this.currentStream;
 
-        try {
-          this.currentStream = await navigator.mediaDevices.getUserMedia(constraints);
-          this.videoElement.srcObject = this.currentStream;
-          this.applyFilter();
-        } catch (error) {
-          console.error("カメラへのアクセスが拒否されました: ", error);
-        }
+              // オートフォーカスを設定
+              const track = this.currentStream.getVideoTracks()[0];
+              const capabilities = track.getCapabilities();
+
+              if (capabilities.focusMode && capabilities.focusMode.includes("continuous")) {
+                  await track.applyConstraints({ advanced: [{ focusMode: "continuous" }] });
+              } else {
+                  console.log("このデバイスではオートフォーカスがサポートされていません。");
+              }
+
+              this.applyFilter();
+          } catch (error) {
+              console.error("カメラへのアクセスが拒否されました: ", error);
+          }
       }
 
       stopCamera() {
