@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ja" class="h-full bg-black">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Instagram風カメラアプリ</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    video, canvas { width: 100%; height: 100%; object-fit: cover; }
+  </style>
+</head>
+<body class="h-full flex flex-col">
+  <main class="flex-grow relative overflow-hidden">
+    <video id="video" autoplay class="w-full h-full"></video>
+    <canvas id="canvas" class="hidden absolute top-0 left-0 w-full h-full"></canvas>
+  </main>
+  
+  <footer class="bg-black text-white p-4">
+    <div class="flex justify-around items-center">
+      <button id="switchCamera" class="focus:outline-none" aria-label="カメラ切り替え">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+      </button>
+      <button id="capture" class="bg-white rounded-full p-2 focus:outline-none" aria-label="写真を撮る">
+        <div class="w-16 h-16 rounded-full border-4 border-black"></div>
+      </button>
+      <button id="flash" class="focus:outline-none" aria-label="フラッシュ切り替え">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+      </button>
+    </div>
+  </footer>
+
+  <div id="capturedImageOverlay" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden">
+    <img id="snapshot" alt="キャプチャ画像" class="max-w-full max-h-full" />
+    <button id="closeOverlay" class="absolute top-4 right-4 text-white focus:outline-none" aria-label="閉じる">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+
+  <script>
+    class CameraApp {
+      constructor() {
+        this.videoElement = document.getElementById("video");
+        this.canvasElement = document.getElementById("canvas");
+        this.snapshotElement = document.getElementById("snapshot");
+        this.capturedImageOverlay = document.getElementById("capturedImageOverlay");
+
+        this.currentStream = null;
+        this.isBackCamera = true;
+        this.flashEnabled = false;
+
+        document.getElementById("switchCamera").addEventListener("click", () => this.switchCamera());
+        document.getElementById("capture").addEventListener("click", () => this.capturePhoto());
+        document.getElementById("flash").addEventListener("click", () => this.toggleFlash());
+        document.getElementById("closeOverlay").addEventListener("click", () => this.closeOverlay());
+
+        this.initCamera();
+      }
+
+      async initCamera() {
+        const constraints = {
+          video: {
+            facingMode: this.isBackCamera ? "environment" : "user",
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          }
+        };
+
+        if (this.currentStream) {
+          this.stopCamera();
+        }
+
+        try {
+          this.currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+          this.videoElement.srcObject = this.currentStream;
+        } catch (error) {
+          console.error("カメラへのアクセスが拒否されました: ", error);
+        }
+      }
+
+      stopCamera() {
+        if (this.currentStream) {
+          this.currentStream.getTracks().forEach(track => track.stop());
+          this.currentStream = null;
+        }
+      }
+
+      async switchCamera() {
+        this.isBackCamera = !this.isBackCamera;
+        await this.initCamera();
+      }
+
+      capturePhoto() {
+        const context = this.canvasElement.getContext("2d");
+        this.canvasElement.width = this.videoElement.videoWidth;
+        this.canvasElement.height = this.videoElement.videoHeight;
+        context.drawImage(this.videoElement, 0, 0, this.canvasElement.width, this.canvasElement.height);
+
+        const imageData = this.canvasElement.toDataURL("image/png");
+        this.snapshotElement.src = imageData;
+        this.capturedImageOverlay.classList.remove("hidden");
+      }
+
+      toggleFlash() {
+        this.flashEnabled = !this.flashEnabled;
+        const track = this.currentStream.getVideoTracks()[0];
+        track.applyConstraints({
+          advanced: [{ torch: this.flashEnabled }]
+        });
+      }
+
+      closeOverlay() {
+        this.capturedImageOverlay.classList.add("hidden");
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      new CameraApp();
+    });
+  </script>
+</body>
+</html>
