@@ -122,10 +122,16 @@
         this.capturedImageOverlay.classList.add("hidden");
       }
 
-      applyZoom() {
-        this.zoomLevel = 2;  // ズームを2倍に固定
-        const track = this.currentStream.getVideoTracks()[0];
-        track.applyConstraints({ advanced: [{ zoom: this.zoomLevel }] });
+      async applyZoom() {
+          const track = this.currentStream.getVideoTracks()[0];
+          const capabilities = track.getCapabilities();
+
+          if (capabilities.zoom) {
+              this.zoomLevel = 2;
+              await track.applyConstraints({ advanced: [{ zoom: this.zoomLevel }] });
+          } else {
+              alert("このデバイスではズーム機能がサポートされていません。");
+          }
       }
 
       toggleFilter() {
