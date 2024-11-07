@@ -17,26 +17,23 @@
   
   <footer class="bg-black text-white p-4">
     <div class="grid grid-cols-3 gap-2">
-      <button id="switchCamera" class="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" aria-label="カメラ切り替え">
-        切り替え
+      <button id="startCamera" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" aria-label="カメラ起動">
+        カメラ起動
       </button>
       <button id="capture" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline" aria-label="写真を撮る">
         撮影
       </button>
-      <button id="stopCamera" class="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" aria-label="カメラ停止">
-        停止
+      <button id="stopCamera" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" aria-label="カメラ停止">
+        カメラ停止
       </button>
-      <button id="flash" class="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" aria-label="フラッシュ切り替え">
-        フラッシュ
+      <button id="switchCamera" class="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" aria-label="カメラ切り替え">
+        切り替え
       </button>
       <button id="zoom" class="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" aria-label="ズーム">
         ズーム
       </button>
       <button id="filter" class="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" aria-label="フィルター">
         フィルター
-      </button>
-      <button id="resolution" class="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" aria-label="解像度">
-        解像度
       </button>
     </div>
   </footer>
@@ -58,35 +55,24 @@
 
         this.currentStream = null;
         this.isBackCamera = true;
-        this.flashEnabled = false;
         this.zoomLevel = 1;
         this.filterEnabled = false;
-        this.resolutionIndex = 0;
-        this.resolutions = [
-          { width: 640, height: 480 },
-          { width: 1280, height: 720 },
-          { width: 1920, height: 1080 }
-        ];
 
-        document.getElementById("switchCamera").addEventListener("click", () => this.switchCamera());
+        document.getElementById("startCamera").addEventListener("click", () => this.initCamera());
         document.getElementById("capture").addEventListener("click", () => this.capturePhoto());
-        document.getElementById("flash").addEventListener("click", () => this.toggleFlash());
         document.getElementById("stopCamera").addEventListener("click", () => this.stopCamera());
-        document.getElementById("closeOverlay").addEventListener("click", () => this.closeOverlay());
+        document.getElementById("switchCamera").addEventListener("click", () => this.switchCamera());
         document.getElementById("zoom").addEventListener("click", () => this.toggleZoom());
         document.getElementById("filter").addEventListener("click", () => this.toggleFilter());
-        document.getElementById("resolution").addEventListener("click", () => this.toggleResolution());
-
-        this.initCamera();
+        document.getElementById("closeOverlay").addEventListener("click", () => this.closeOverlay());
       }
 
       async initCamera() {
-        const currentResolution = this.resolutions[this.resolutionIndex];
         const constraints = {
           video: {
             facingMode: this.isBackCamera ? "environment" : "user",
-            width: { ideal: currentResolution.width },
-            height: { ideal: currentResolution.height }
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
           }
         };
 
@@ -132,14 +118,6 @@
         this.capturedImageOverlay.classList.remove("hidden");
       }
 
-      toggleFlash() {
-        this.flashEnabled = !this.flashEnabled;
-        const track = this.currentStream.getVideoTracks()[0];
-        track.applyConstraints({
-          advanced: [{ torch: this.flashEnabled }]
-        });
-      }
-
       closeOverlay() {
         this.capturedImageOverlay.classList.add("hidden");
       }
@@ -157,11 +135,6 @@
 
       applyFilter() {
         this.videoElement.style.filter = this.filterEnabled ? "grayscale(100%)" : "none";
-      }
-
-      toggleResolution() {
-        this.resolutionIndex = (this.resolutionIndex + 1) % this.resolutions.length;
-        this.initCamera();
       }
     }
 
